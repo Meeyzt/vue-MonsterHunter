@@ -34,11 +34,11 @@
         <button @click="escape()" class="transition-all rounded-md w-30 h-30 text-black cursor-pointer bg-gray-300 p-3 text-xl hover:scale-110 border-2 border-hoverContainer hover:border-yellow-100 shadow-lg uppercase">Kaç</button>
       </div>
       <div v-if="actionLogs.length >0" class="overflow-auto rounded-lg shadow-2xl">
-        <table class="text-white w-[500px] shadow-lg">
-        <tr v-for="(log,index) in actionLogs" :key="index" class="order-4 transition-all hover:bg-containerColor hover:scale-105 even:bg-enemyColor bg-allyColor">
-          <td class=" p-1 px-4">{{log}}</td>
-        </tr>
-      </table>
+        <div class="text-white w-[500px] shadow-lg flex flex-col-reverse">
+        <div v-for="(log,index) in actionLogs" :key="index" class="transition-all hover:bg-containerColor hover:scale-105 even:bg-enemyColor bg-allyColor">
+          <div class="p-1 px-4">{{log}}</div>
+        </div>
+      </div>
       </div>
       <div class="h-2"></div>
   </div>
