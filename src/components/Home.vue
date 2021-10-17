@@ -1,6 +1,6 @@
 <template>
 <div class="flex flex-row items-start justify-center">
-  <div class="flex flex-col items-center h-full w-[900px] pt-5 gap-10">
+  <div class="flex flex-col flex-1 items-center h-full pt-5 gap-10">
   <div class="flex flex-row w-full gap-10">
     <div class="group w-full h-24">
       <div class="flex flex-col gap-4 items-center">
@@ -29,13 +29,14 @@
   <div v-if="onTheGame" class="w-full flex flex-col max-h-[500px] overflow-auto items-center justify-center gap-5 bg-containerColor border-2 border-hoverContainer shadow-xl rounded-md">
       <div class="flex flex-row pt-5 gap-3">
         <button @click="playerTurn('normalAttack')" class="transition-all rounded-md w-30 h-30 bg-yellow-300 cursor-pointer text-gray-900 p-3 text-xl hover:scale-110 border-2 border-hoverContainer hover:border-red-300 shadow-lg uppercase">Saldırı</button>
-        <button @click="playerTurn('specialAttack')" class="transition-all rounded-md w-30 h-30 bg-yellow-600 cursor-pointer text-gray-200 p-3 text-xl hover:scale-110 border-2 border-hoverContainer hover:border-red-600 shadow-lg uppercase">Özel Saldırı</button>
+        <button @click="playerTurn('specialAttack')" class="transition-all rounded-md max-w-30 max-h-30 bg-yellow-600 cursor-pointer text-gray-200 p-3 text-xl hover:scale-110 border-2 border-hoverContainer hover:border-red-600 shadow-lg uppercase">Özel Saldırı</button>
         <button @click="playerTurn('heal')" class="transition-all rounded-md w-30 h-30 bg-green-300 cursor-pointer text-gray-600 p-3 text-xl hover:scale-110 border-2 border-hoverContainer hover:border-green-600 shadow-lg uppercase">İlk Yardım</button>
         <button @click="escape()" class="transition-all rounded-md w-30 h-30 text-black cursor-pointer bg-gray-300 p-3 text-xl hover:scale-110 border-2 border-hoverContainer hover:border-yellow-100 shadow-lg uppercase">Kaç</button>
       </div>
       <div v-if="actionLogs.length >0" class="overflow-auto rounded-lg shadow-2xl">
         <div class="text-white w-[500px] shadow-lg flex flex-col-reverse">
-        <div v-for="(log,index) in actionLogs" :key="index" class="transition-all hover:bg-containerColor hover:scale-105 even:bg-enemyColor bg-allyColor">
+        <div v-for="(log,index) in actionLogs" :key="index" class="transition-all hover:bg-containerColor hover:scale-105 flex flex-row even:bg-enemyColor bg-allyColor">
+          <div class="p-1 px-4">{{index}}</div>
           <div class="p-1 px-4">{{log}}</div>
         </div>
       </div>
@@ -77,42 +78,50 @@ export default {
     initGameArea() {
       this.playerHealth = 100;
       this.monsterHealth = 100;
-      this.logs= [],
+      this.actionLogs = [];
     },
     playerTurn(ability) {
       if (ability === 'normalAttack') {
         const Damage = this.randomPicker(this.ability.normalAtack);
         this.monsterHealth -= Damage;
-        this.actionLogs.push(`Sen normalAttack yeteneğini kullandı ve Canavar' a ${Damage} hasar verdi `);
+        this.createLog('Sen', 'Canavar', 'normalAttack', Damage);
       } else if (ability === 'specialAttack') {
         const Damage = this.randomPicker(this.ability.specialAtack);
         this.monsterHealth -= Damage;
-        this.actionLogs.push(`Sen specialAttack yeteneğini kullandı ve Canavar' a ${Damage} hasar verdi `);
+        this.createLog('Sen', 'Canavar', 'specialAttack', Damage);
       } else {
         const healCount = this.randomPicker(this.ability.normalAtack);
         this.playerHealth += healCount;
         this.actionLogs.push(`Sen FirstAidKit yeteneğini kullandı ve ${healCount} iyileşti `);
+        this.createLog('Sen', 'Canavar', 'firstAidKit', healCount);
       }
       this.monsterTurn();
-    },
-    escape() {
-      this.playerHealth = 0;
     },
     monsterTurn() {
       const luckyNumber = this.randomPicker(3);
       if (luckyNumber === 1) {
         const Damage = this.randomPicker(this.ability.normalAtack);
         this.playerHealth -= Damage;
-        this.actionLogs.push(`Canavar normalAttack yeteneğini kullandı ve Sen' e ${Damage} hasar verdi`);
+        this.createLog('Monster', 'Sen', 'normalAttack', Damage);
       } else if (luckyNumber === 2) {
         const Damage = this.randomPicker(this.ability.specialAtack);
         this.playerHealth -= Damage;
-        this.actionLogs.push(`Canavar specialAttack yeteneğini kullandı ve Sen' e ${Damage} hasar verdi`);
+        this.createLog('Monster', 'Sen', 'specialAttack', Damage);
       } else if (luckyNumber === 3) {
         const healCount = this.randomPicker(this.ability.heal);
         this.monsterHealth += healCount;
-        this.actionLogs.push(`Canavar bandage yeteneğini kullandı ve ${healCount} iyileşti.`);
+        this.createLog('Monster', 'Sen', 'firstAidKit', healCount);
       }
+    },
+    createLog(fromAction, toAction, action, count) {
+      if (action !== 'firstAidKit') {
+        this.actionLogs.push(`${fromAction} ${action} yeteneğini kullandı ve ${toAction}' a ${count} hasar verdi`);
+      } else {
+        this.actionLogs.push(`${fromAction} ${action} yeteneğini kullandı ve ${count} iyileşti`);
+      }
+    },
+    escape() {
+      this.playerHealth = 0;
     },
     randomPicker(multiple) {
       return Math.ceil(Math.random() * multiple);
