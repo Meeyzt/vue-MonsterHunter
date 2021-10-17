@@ -77,6 +77,7 @@ export default {
     initGameArea() {
       this.playerHealth = 100;
       this.monsterHealth = 100;
+      this.logs= [],
     },
     playerTurn(ability) {
       if (ability === 'normalAttack') {
